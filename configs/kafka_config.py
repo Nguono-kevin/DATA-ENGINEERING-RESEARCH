@@ -1,5 +1,5 @@
-from kafka import KafkaProducer
 import json
+from kafka import KafkaProducer
 
 def create_producer():
 
