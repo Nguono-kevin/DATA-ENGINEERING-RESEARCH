@@ -1,24 +1,28 @@
 # weather_consumer.py
-import os
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import from_json, col
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType, LongType
+from pyspark.sql.types import (
+    StructType,
+    StructField,
+    StringType,
+    DoubleType,
+    IntegerType,
+    LongType
+)
 
 # ---------------------------
-# 1. Windows Hadoop setup
+# 1. Create Spark Session
 # ---------------------------
-os.environ["HADOOP_HOME"] = "C:\\hadoop"
-os.environ["HADOOP_CONF_DIR"] = "C:\\hadoop\\etc\\hadoop"
 
-# ---------------------------
-# 2. Define Spark session
-# ---------------------------
 spark = SparkSession.builder \
     .appName("KafkaWeatherConsumer") \
     .getOrCreate()
 
+spark.sparkContext.setLogLevel("WARN")
+
 # ---------------------------
-# 3. Define Kafka topic schema
+# 2. Define Weather Schema
 # ---------------------------
 weather_schema = StructType([
     StructField("region", StringType(), True),
@@ -31,30 +35,41 @@ weather_schema = StructType([
 ])
 
 # ---------------------------
-# 4. Read streaming data from Kafka
+# 3. Read Kafka Stream
 # ---------------------------
-df = spark.readStream \
-    .format("kafka") \
-    .option("kafka.bootstrap.servers", "localhost:9092") \
-    .option("subscribe", "kenya_weather") \
-    .option("startingOffsets", "latest") \
+kafka_df = (
+    spark.readStream
+    .format("kafka")
+    .option("kafka.bootstrap.servers", "localhost:9092")
+    .option("subscribe", "kenya_weather")
+    .option("startingOffsets", "latest")
     .load()
-
-# Kafka message value is in binary, convert to string
-df_str = df.selectExpr("CAST(value AS STRING)")
-
-# Parse JSON into structured columns
-df_parsed = df_str.withColumn("data", from_json(col("value"), weather_schema)) \
-                  .select("data.*")
+)
 
 # ---------------------------
-# 5. Output streaming to console
+# 4. Convert Kafka Binary → String
 # ---------------------------
-query = df_parsed.writeStream \
-    .format("console") \
-    .outputMode("append") \
-    .option("truncate", False) \
-    .option("checkpointLocation", "C:\\Spark\\checkpoints\\weather") \
+json_df = kafka_df.selectExpr("CAST(value AS STRING) as json")
+
+# ---------------------------
+# 5. Parse JSON Data
+# ---------------------------
+weather_df = (
+    json_df
+    .withColumn("data", from_json(col("json"), weather_schema))
+    .select("data.*")
+)
+
+# ---------------------------
+# 6. Output Stream (Console)
+# ---------------------------
+query = (
+    weather_df.writeStream
+    .format("console")
+    .outputMode("append")
+    .option("truncate", False)
+    .option("checkpointLocation", "C:/spark_checkpoint/weather")
     .start()
+)
 
 query.awaitTermination()
