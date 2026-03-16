@@ -1,9 +1,9 @@
-western=["Kisumu","Kakamega","Siaya","Homabay","Bungoma","Busia","Vihiga","Migori","Kisii","Nyamira"]
+western=["Kisumu","Kakamega","Siaya","Bungoma","Busia","Vihiga","Migori","Kisii","Nyamira"]
 
-rift_valley=["Nakuru","Eldoret","Naivasha","Uasin Gishu","Kitale","Kericho","Bomet","Turkana","West Pokot","Trans Nzoia"]
+rift_valley=["Nakuru","Eldoret","Naivasha","Kitale","Kericho","Bomet"]
 
-central=["Nyeri","Kiambu","Muranga","Thika","Kirinyaga","Nyandarua"]
+central=["Nyeri","Kiambu","Muranga","Thika"]
 
-eastern=["Machakos","Meru","Embu","Isiolo","Garissa","Wajir","Marsabit","Samburu",]
+eastern=["Machakos","Meru","Embu","Isiolo","Garissa","Wajir","Marsabit","Samburu"]
 
-coast=["Mombasa","Malindi","Kilifi","Lamu","Kwale","Tana River",]
+coast=["Mombasa","Malindi","Kilifi","Lamu","Kwale"]
