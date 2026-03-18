@@ -1,6 +1,9 @@
-weather_df.writeStream \
-.format("parquet") \
-.option("path","gs://kenya-weather-data/processed") \
-.option("checkpointLocation","gs://kenya-weather-data/checkpoints") \
-.outputMode("append") \
-.start()
+def write_stream_to_gcs(df, bucket_name):
+    query = df.writeStream \
+        .format("parquet") \
+        .option("path", f"gs://{bucket_name}/weather-data") \
+        .option("checkpointLocation", f"gs://{bucket_name}/checkpoints") \
+        .partitionBy("region", "date") \
+        .outputMode("append") \
+        .start()
+    return query
